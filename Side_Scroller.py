@@ -34,13 +34,13 @@ font = pygame.font.SysFont("Verdana", 60)
 font_small = pygame.font.SysFont("Verdana", 20)
 
 #player class
-class player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("player1_pro.png")
         self.rect = self.image.get_rect()
-        self.rect.center = (80,80)
-        self.rect.move_ip(0,330)
+        self.rect.center = (45,370)
+        
     def move(self):    
         pressed_keys=pygame.key.get_pressed()
         if self.rect.left > 0:
@@ -49,39 +49,42 @@ class player(pygame.sprite.Sprite):
         if self.rect.right < Screen_width:
             if pressed_keys[K_d]:
                 self.rect.move_ip(5,0)
-
     def jump(self):
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[K_w]:
-            self.rect.move_ip(0,-5)
+        if pressed_keys[K_SPACE]:
+            jump = True
+        
+                
+
     def attack(self):
         pressed_keys = pygame.key.get_pressed
         
 #enemy class
 
-#player and enemy 
-P1= player()
-#E1= enemy()
+player = Player()
 
 #creating Sprites Groups
-#enemies = pygame.sprite.Group()
-#enemies.add(E1)
 all_sprites = pygame.sprite.Group()
-all_sprites.add(P1)
-#all_sprites.add(E1)
+all_sprites.add(player)
+
+jump = False
 #game loop
 while True:
-    #adds background
     
-    displaysurf.blit(background,(0,0))
     
 
+    #adds background
+    displaysurf.blit(background,(0,0))
+    
     for entity in all_sprites:
         displaysurf.blit(entity.image,entity.rect)
         entity.move()
 
+    if jump == True:
+        if player.rect.y == 400:
+            player.rect.move_ip (1,100)
 
-
+   
 
     #quit the game correctly
     for event in pygame.event.get():
