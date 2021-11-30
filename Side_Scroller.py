@@ -5,6 +5,7 @@ import random, time
 
 #initialize programs
 pygame.init()
+fire = False
 
 #FPS assigning
 FPS= 60 
@@ -21,9 +22,8 @@ white = (255,255,255)
 Screen_width = 600
 Screen_height = 600
 
-#display surf
 
-background = pygame.image.load('background_side_scroller.png')
+#display surf
 displaysurf = pygame.display.set_mode((Screen_width,Screen_height))
 displaysurf.fill(white)
 pygame.display.set_caption("nick's side scroller")
@@ -32,14 +32,15 @@ pygame.display.set_caption("nick's side scroller")
 #fonts
 font = pygame.font.SysFont("Verdana", 60)
 font_small = pygame.font.SysFont("Verdana", 20)
+game_over = font.render("Game Over", True, black)
 
 #player class
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("player1_pro.png")
+        self.image = pygame.image.load("Player1.png")
         self.rect = self.image.get_rect()
-        self.rect.center = (45,370)
+        self.rect.center = (45,550)
         
     def move(self):    
         pressed_keys=pygame.key.get_pressed()
@@ -49,42 +50,53 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right < Screen_width:
             if pressed_keys[K_d]:
                 self.rect.move_ip(5,0)
-    def jump(self):
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[K_SPACE]:
-            jump = True
-        
-                
+    def fire(self):
+        pressed_keys=pygame.key.get_pressed()
+        if pressed_keys[K_w]:
+            self.fire = True
 
-    def attack(self):
-        pressed_keys = pygame.key.get_pressed
         
 #enemy class
+class enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("Enemy.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = (random.randint(40,Screen_width-40),0)
+
+    def move(self):
+        self.rect.move_ip(0,5)
+        if (self.rect.bottom > 600):
+            self.rect.top = 0
+            self.rect.center = (random.randint(40,Screen_width-40),0)
 
 player = Player()
-
+E1 = enemy()
+E2 =enemy()
 #creating Sprites Groups
+enemies = pygame.sprite.Group()
+enemies.add(E1)
+enemies.add(E2)
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+all_sprites.add(E1)
+all_sprites.add(E2)
 
-jump = False
+
+
 #game loop
 while True:
     
     
 
     #adds background
-    displaysurf.blit(background,(0,0))
+    displaysurf.fill(white)
     
     for entity in all_sprites:
         displaysurf.blit(entity.image,entity.rect)
         entity.move()
 
-    if jump == True:
-        if player.rect.y == 400:
-            player.rect.move_ip (1,100)
 
-   
 
     #quit the game correctly
     for event in pygame.event.get():
@@ -93,12 +105,24 @@ while True:
             pygame.quit()
             sys.exit()
 
-    
-        
-        #time.sleep(2)
-        #pygame.quit()
-        #sys.exit()
+    #fire
+    if player.fire == True:
+        displaysurf.blit(game_over,(30,250))
+    #collision
+    if pygame.sprite.spritecollideany(player, enemies):
+        time.sleep(0.5)
 
+        displaysurf.fill(red)
+        displaysurf.blit(game_over,(30,250))
+
+
+
+        pygame.display.update()
+        for entity in all_sprites:
+            entity.kill()
+        time.sleep(2)
+        pygame.quit()
+        sys.exit()
 
     pygame.display.update()
     Clock.tick(FPS)
